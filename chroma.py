@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import os
 import sys
 import argparse
@@ -11,37 +10,23 @@ def main(args):
     import authentications
     os.environ["OPENAI_API_KEY"] = authentications.APIKEY
 
-
-    # directory loader
-    from langchain_community.document_loaders.directory import DirectoryLoader
-
-    loaderdir = DirectoryLoader(args.f)
-    docs = loaderdir.load_and_split()
-
-    # split documents
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, chunk_overlap=200, add_start_index=True
-    )
-    all_splits = text_splitter.split_documents(docs)
-
-    # vectorize and index
+    # Load Chroma db
     from langchain_community.vectorstores import Chroma
     from langchain_openai import OpenAIEmbeddings
 
-    vectorstore = Chroma.from_documents(documents=all_splits, 
-                                        embedding=OpenAIEmbeddings())
+    vectorstore = Chroma(persist_directory=args.d,
+                         embedding_function=OpenAIEmbeddings())
 
     # retrieve data
     retriever = vectorstore.as_retriever(search_type="similarity", 
-                                        search_kwargs={"k": 6})
+                                        search_kwargs={"k": 8})
 
 
     # language model
     from langchain_openai import ChatOpenAI
 
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3)
+    model_name = {'A':'gpt-3.5-turbo','B':'gpt-4'}
+    llm = ChatOpenAI(model_name=model_name[args.m], temperature=0.3)
 
     # set up prompt
     from langchain_core.output_parsers import StrOutputParser
@@ -51,9 +36,7 @@ def main(args):
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
 
-    template = """Use the following pieces of context to answer the question at the end.
-    If you don't know the answer, just say that you don't know, don't try to make up an answer.
-    Be precise and concise with your answers, but do not omit any important information.
+    template = """context:
 
     {context}
 
@@ -76,8 +59,10 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Ask a question')
+    parser = argparse.ArgumentParser(description='This script is used to ask a question where a knowledge base is provided (chromadb)')
     parser.add_argument('-q', type=str, help='the question to ask')
-    parser.add_argument('-f', type=str, help='the directory containing the contextual data')
+    parser.add_argument('-d', type=str, help='path to persisted Chroma db')
+    # choose gpt model ,default is gpt-3.5-turbo
+    parser.add_argument('-m', type=str, default='A',help='gpt model name, choose A: gpt-3.5-turbo, B: gpt-4')
     args = parser.parse_args()
     main(args)

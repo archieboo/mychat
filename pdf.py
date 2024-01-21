@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 import argparse
@@ -45,7 +46,8 @@ def main(args):
     # language model
     from langchain_openai import ChatOpenAI
 
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3)
+    model_name = {'A':'gpt-3.5-turbo','B':'gpt-4'}
+    llm = ChatOpenAI(model_name=model_name[args.m], temperature=0.3)
 
     # set up prompt
     from langchain_core.output_parsers import StrOutputParser
@@ -81,5 +83,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Summarize or ask a question about a pdf document.')
     parser.add_argument('-q', type=str, help='the question to ask')
     parser.add_argument('-f', type=str, help='path to the pdf file')
+    # choose gpt model ,default is gpt-3.5-turbo
+    parser.add_argument('-m', type=str, default='A',help='gpt model name, choose A: gpt-3.5-turbo, B: gpt-4')
     args = parser.parse_args()
     main(args)
