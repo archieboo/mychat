@@ -2,11 +2,8 @@ import os
 import sys
 import streamlit as st
 import shutil
+from dotenv import load_dotenv
     
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'donotsync'))
-import authentications
-os.environ["OPENAI_API_KEY"] = authentications.APIKEY
-
 from htmlTemplates import css, bot_template, user_template
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
@@ -105,6 +102,8 @@ def get_prompt(question, retriever):
     return rag_chain
 
 def main():
+
+    load_dotenv()
 
     st.set_page_config(page_title="Chat with multiple PDFs",
                        page_icon=":books:")

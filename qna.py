@@ -3,14 +3,12 @@
 import os
 import sys
 import argparse
+from dotenv import load_dotenv
 
 
 def main(args):
 
-    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'donotsync'))
-    import authentications
-    os.environ["OPENAI_API_KEY"] = authentications.APIKEY
-
+    load_dotenv()
 
     # directory loader
     from langchain_community.document_loaders.directory import DirectoryLoader

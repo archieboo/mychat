@@ -1,5 +1,6 @@
 donotsync
 donotsync/**/*
+.env
 authentications*
 **/authentications*
 data
