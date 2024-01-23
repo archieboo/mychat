@@ -45,7 +45,7 @@ def main(args):
     vectorstore = Chroma.from_documents(documents=all_splits, 
                                         embedding=OpenAIEmbeddings(),
                                         persist_directory=args.to)
-    print("Done at ", datetime.datetime.now())
+    print("Done at ", datetime.now())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""

@@ -55,7 +55,10 @@ def main(args):
 
     # ask question
     question = args.q
-    print(rag_chain.invoke(f"{question}"))
+    try:
+        print(rag_chain.invoke(f"{question}"))
+    except openai.APIConnectionError:
+        print("Connection Error. Are you connected to Internet?")
 
 
 if __name__ == "__main__":
